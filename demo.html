@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoConnect - Tour Guide Portal</title>
+    <style>
+        :root {
+            /* Sky Blue Palette */
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --sidebar-bg: #f0f9ff;
+            --sidebar-hover: #e0f2fe;
+            --sidebar-active: #bae6fd;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
+        .hidden { display: none !important; }
+
+        /* Buttons */
+        .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background-color: #f1f5f9; }
+        .btn-danger { background-color: #fef2f2; border: 1px solid #fecaca; color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger); color: white; }
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Fullscreen Layouts */
+        .fullscreen-flex { display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #e0f2fe 0%, #7dd3fc 100%); flex-direction: column; }
+        .card-center { background: var(--card-bg); padding: 3rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 450px; text-align: center; }
+        .logo { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem; }
+        .logo span { color: #16a34a; }
+
+        /* Sidebar & App Layout */
+        .app-container { display: flex; height: 100vh; }
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+        .badge-verified { display: inline-flex; align-items: center; gap: 0.25rem; background: #dcfce7; color: #166534; padding: 0.2rem 0.5rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; margin-top: 0.5rem; }
+        .nav-menu { list-style: none; padding: 1rem 0; flex-grow: 1; }
+        .nav-item { padding: 0.75rem 1.5rem; cursor: pointer; color: var(--text-main); font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
+        .nav-item:hover { background-color: var(--sidebar-hover); }
+        .nav-item.active { background-color: var(--sidebar-active); border-right: 4px solid var(--primary); color: var(--primary); }
+
+        /* Quota Widget */
+        .quota-widget { margin: 1.5rem; padding: 1rem; background-color: white; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
+        .quota-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin: 0.5rem 0; overflow: hidden; }
+        .quota-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+        .quota-fill.full { background: var(--warning); }
+
+        /* Main Content */
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 2rem 3rem; background: #f8fafc; }
+        .header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+
+        /* Forms & Inputs */
+        .card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .form-control { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        /* Package Grid */
+        .package-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        .package-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; transition: 0.2s; }
+        .package-card-header { padding: 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start;}
+        .package-card-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem; }
+        .package-card-route { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .package-card-body { padding: 1.25rem; font-size: 0.9rem; color: var(--text-main); flex-grow: 1; line-height: 1.6; }
+        .package-card-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Workspace Grid */
+        .workspace-grid { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; align-items: start; }
+        
+        /* Lists & Viewpoints */
+        .item-list { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-top: 1rem; background: white; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+        .list-item:last-child { border-bottom: none; }
+        .vp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; }
+        .vp-item { display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+
+        /* Toggle */
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        /* Spinner */
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="view-login" class="fullscreen-flex">
+        <div class="card-center">
+            <div class="logo">Eco<span>Connect</span></div>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Professional Tour Management Portal</p>
+            <h2 style="font-size: 1.5rem;">Welcome Back</h2>
+            <button class="btn btn-outline" style="width: 100%; margin-top: 1.5rem; justify-content: center;" onclick="navigateTo('view-register')">
+                <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Sign in with Google
+            </button>
+        </div>
+    </div>
+
+    <div id="view-register" class="fullscreen-flex hidden">
+        <div class="card-center">
+            <div class="logo">Eco<span>Connect</span></div>
+            <h2 style="font-size: 1.5rem; margin-top: 1rem; margin-bottom: 1.5rem;">Register Agency</h2>
+            <div class="form-group">
+                <label>Agency Name</label>
+                <input type="text" id="reg-name" class="form-control" placeholder="e.g. Summit Trails">
+            </div>
+            <div class="form-group">
+                <label>Base City</label>
+                <select id="reg-city" class="form-control">
+                    <option value="">-- Select Base City --</option>
+                    <option value="Islamabad">Islamabad</option>
+                    <option value="Lahore">Lahore</option>
+                    <option value="Peshawar">Peshawar</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="submitRegistration()">Complete Setup</button>
+        </div>
+    </div>
+
+    <div id="view-verifying" class="fullscreen-flex hidden">
+        <div class="spinner"></div>
+        <h2 style="color: var(--primary);">Verifying Agency Details...</h2>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Awaiting Admin Approval</p>
+    </div>
+
+    <div id="app-layout" class="app-container hidden">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" style="font-size: 1.5rem;">Eco<span>Connect</span></div>
+                <div id="display-agency" style="font-weight: 700; font-size: 0.95rem; margin-top: 0.5rem;"></div>
+                <div id="display-city" style="font-size: 0.8rem; color: var(--text-muted);"></div>
+                <div class="badge-verified">✓ Verified Agency</div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="showView('dashboard')"><span>📦</span> Packages</li>
+                <li class="nav-item" onclick="location.reload()" style="color: var(--danger); margin-top: auto;"><span>🚪</span> Logout</li>
+            </ul>
+
+            <div class="quota-widget">
+                <div style="font-size: 0.85rem; font-weight: 600;">Package Limit</div>
+                <div class="quota-bar"><div id="quota-fill" class="quota-fill"></div></div>
+                <div id="quota-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">0 / 5 Packages</div>
+                <button id="btn-subscribe" class="btn btn-warning hidden" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;">⭐ Upgrade to Pro</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <div id="view-dashboard">
+                <div class="header-action">
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p style="color: var(--text-muted);">Manage your online travel routes and services.</p>
+                    </div>
+                    <button id="btn-create-pkg" class="btn btn-primary" onclick="openCreateForm()">＋ Create Package</button>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total Packages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-active" style="color: var(--success);">0</div>
+                        <div class="stat-label">Active Online</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-avg">PKR 0</div>
+                        <div class="stat-label">Avg. Price</div>
+                    </div>
+                </div>
+
+                <div id="package-list" class="package-grid"></div>
+            </div>
+
+            <div id="view-shell" class="hidden">
+                <div class="header-action">
+                    <div>
+                        <h1 id="shell-title-text">Create Package Shell</h1>
+                        <p style="color: var(--text-muted);">Set core details. You'll add stops and services in the workspace.</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="showView('dashboard')">Cancel</button>
+                </div>
+                <div class="card" style="max-width: 600px;">
+                    <div class="form-group"><label>Package Title *</label><input type="text" id="sh-title" class="form-control"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Origin City *</label><select id="sh-origin" class="form-control"><option value="Islamabad">Islamabad</option><option value="Lahore">Lahore</option></select></div>
+                        <div class="form-group"><label>Destination City *</label><select id="sh-dest" class="form-control"><option value="Naran">Naran</option><option value="Murree">Murree</option><option value="Bahawalpur">Bahawalpur</option></select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Days *</label><input type="number" id="sh-days" class="form-control" value="3"></div>
+                        <div class="form-group"><label>Nights *</label><input type="number" id="sh-nights" class="form-control" value="2"></div>
+                    </div>
+                    <div class="form-group"><label>Base Price (PKR) *</label><input type="number" id="sh-price" class="form-control" value="15000"></div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top: 1rem;" onclick="savePackageShell()">Save & Proceed →</button>
+                </div>
+            </div>
+
+            <div id="view-workspace" class="hidden">
+                <div class="header-action">
+                    <button class="btn btn-outline" onclick="showView('dashboard')">← Back to Dashboard</button>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Package Status:</span>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span id="ws-status-text" style="font-size:0.85rem; font-weight:600;">Draft</span>
+                            <label class="switch">
+                                <input type="checkbox" id="ws-toggle" onchange="toggleCurrentPackageStatus()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workspace-grid">
+                    <div>
+                        <div class="card" style="background: var(--sidebar-bg); border: 1px solid var(--primary); position: sticky; top: 2rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 1rem;">
+                                <h2 id="ws-title" style="color: var(--primary); font-size: 1.3rem;"></h2>
+                                <button class="btn btn-outline btn-sm" onclick="openEditForm()">✏️ Edit</button>
+                            </div>
+                            <div id="ws-route" style="font-weight: 600; margin-bottom: 1rem; color: var(--text-main);"></div>
+                            <div style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.8;">
+                                <div><span style="display:inline-block; width:20px;">🗓️</span> <span id="ws-days"></span></div>
+                                <div><span style="display:inline-block; width:20px;">🌙</span> <span id="ws-nights"></span></div>
+                                <div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border); font-weight:700; color:var(--text-main);">
+                                    PKR <span id="ws-price"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card">
+                            <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">1. Itinerary & Stops</h3>
+                            
+                            <div id="add-stop-form">
+                                <div class="form-row" style="align-items: end; margin-bottom: 1rem;">
+                                    <div class="form-group" style="margin:0;">
+                                        <label>City Stop</label>
+                                        <select id="ws-stop-city" class="form-control" onchange="loadViewpoints()">
+                                            <option value="">-- Choose City --</option>
+                                            <option value="Islamabad">Islamabad</option>
+                                            <option value="Murree">Murree</option>
+                                            <option value="Naran">Naran</option>
+                                            <option value="Bahawalpur">Bahawalpur</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="addStop()">＋ Add Stop</button>
+                                </div>
+                                <div id="vp-container" class="hidden" style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border: 1px dashed var(--primary); border-radius: 6px;">
+                                    <label style="font-size:0.85rem; font-weight:600; margin-bottom:0.5rem; display:block;">Select Viewpoints Included:</label>
+                                    <div id="ws-viewpoints" class="vp-grid" style="margin-bottom: 1rem;"></div>
+                                    <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-weight:600; color:var(--primary);">
+                                        <input type="checkbox" id="ws-is-dest"> 🏁 Mark as Final Destination
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="dest-locked-msg" class="hidden" style="background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); padding: 1rem; border-radius: 6px; text-align: center; margin-bottom: 1rem; font-weight: 600;">
+                                🏁 Final Destination Reached. Route is locked.
+                            </div>
+
+                            <div id="ws-stops-list" class="item-list"></div>
+                        </div>
+
+                        <div class="card">
+                            <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">2. Included Services</h3>
+                            <div class="form-row" style="align-items: end; margin-bottom: 1rem;">
+                                <div class="form-group" style="margin:0;">
+                                    <select id="ws-service-sel" class="form-control">
+                                        <option value="AC Transport">AC Transport</option>
+                                        <option value="Breakfast">Breakfast</option>
+                                        <option value="First Aid Kit">First Aid Kit</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" onclick="addService()">＋ Add Service</button>
+                            </div>
+                            <div id="ws-services-list" class="item-list"></div>
+                        </div>
+
+                        <div class="card">
+                            <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">3. Paid Add-ons</h3>
+                            <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap: 0.5rem; align-items: end; margin-bottom: 1rem;">
+                                <div class="form-group" style="margin:0;"><select id="ws-addon-sel" class="form-control"><option value="Travel Insurance">Travel Insurance</option><option value="Separate Room">Separate Room</option></select></div>
+                                <div class="form-group" style="margin:0;"><input type="number" id="ws-addon-price" class="form-control" placeholder="Price"></div>
+                                <button class="btn btn-primary" onclick="addAddon()">＋ Add</button>
+                            </div>
+                            <div id="ws-addons-list" class="item-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- DATA DICTIONARY ---
+        const vpDB = {
+            "Islamabad": ["Faisal Mosque", "Daman-e-Koh", "Pakistan Monument"],
+            "Murree": ["Mall Road", "Pindi Point", "Patriata Cable Car"],
+            "Naran": ["Lake Saif ul Malook", "Babusar Pass", "Lulusar Lake"],
+            "Bahawalpur": ["Noor Mahal", "Derawar Fort", "Lal Suhanra"]
+        };
+
+        const MAX_PACKAGES = 5;
+        let packages = [
+            {
+                id: 1, title: "Kashmir Trail Base", origin: "Islamabad", dest: "Naran", days: 5, nights: 4, price: 25000, isActive: true,
+                stops: [ { city: "Murree", vps: ["Mall Road"], isDest: false }, { city: "Naran", vps: ["Lake Saif ul Malook"], isDest: true } ],
+                services: ["AC Transport", "Breakfast"],
+                addons: [ { name: "Travel Insurance", price: 1500 } ]
+            }
+        ];
+        
+        let editingShellId = null;
+        let activeWorkspaceId = null;
+
+        // --- NAVIGATION ---
+        function navigateTo(id) {
+            document.querySelectorAll('.fullscreen-flex, .app-container').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function showView(id) {
+            ['dashboard', 'shell', 'workspace'].forEach(v => document.getElementById('view-'+v).classList.add('hidden'));
+            document.getElementById('view-'+id).classList.remove('hidden');
+            if (id === 'dashboard') renderDashboard();
+        }
+
+        // --- REGISTRATION & VERIFICATION ---
+        function submitRegistration() {
+            const name = document.getElementById('reg-name').value;
+            const city = document.getElementById('reg-city').value;
+            if(!name || !city) { alert("Please fill all fields."); return; }
+            
+            document.getElementById('display-agency').innerText = name;
+            document.getElementById('display-city').innerText = `📍 Base: ${city}`;
+            
+            navigateTo('view-verifying');
+            
+            // 5 Second Admin Verification Simulation
+            setTimeout(() => {
+                navigateTo('app-layout');
+                renderDashboard();
+            }, 5000);
+        }
+
+        // --- DASHBOARD & STATS ---
+        function renderDashboard() {
+            updateDashboardStats();
+            updateSubscriptionQuota();
+
+            const list = document.getElementById('package-list');
+            list.innerHTML = packages.length === 0 ? "<p>No packages yet.</p>" : "";
+            
+            packages.forEach(pkg => {
+                const isOnline = pkg.isActive ? "🟢 Online" : "⚫ Draft";
+                list.innerHTML += `
+                    <div class="package-card" style="opacity: ${pkg.isActive ? '1' : '0.7'}">
+                        <div class="package-card-header">
+                            <div><div class="package-card-title">${pkg.title}</div><div class="package-card-route">${pkg.origin} → ${pkg.dest}</div></div>
+                            <div style="font-size:0.8rem; font-weight:600;">${isOnline}</div>
+                        </div>
+                        <div class="package-card-body">
+                            <div><strong>Duration:</strong> ${pkg.days}D / ${pkg.nights}N</div>
+                            <div style="margin-top:0.3rem;"><strong>Stops:</strong> ${pkg.stops.length}</div>
+                            <div style="margin-top:0.3rem;"><strong>Base Price:</strong> PKR ${parseInt(pkg.price).toLocaleString()}</div>
+                        </div>
+                        <div class="package-card-footer">
+                            <button class="btn btn-outline btn-sm" onclick="openWorkspace(${pkg.id})">⚙️ Workspace</button>
+                            <button class="btn btn-danger btn-sm" onclick="deletePackage(${pkg.id})">🗑 Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateDashboardStats() {
+            const total = packages.length;
+            const active = packages.filter(p => p.isActive).length;
+            const avg = total > 0 ? packages.reduce((sum, p) => sum + parseInt(p.price), 0) / total : 0;
+            
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-avg').innerText = `PKR ${avg.toLocaleString(undefined, {maximumFractionDigits:0})}`;
+        }
+
+        function updateSubscriptionQuota() {
+            const count = packages.length;
+            const fill = document.getElementById('quota-fill');
+            const btn = document.getElementById('btn-create-pkg');
+            const subBtn = document.getElementById('btn-subscribe');
+
+            fill.style.width = ((count / MAX_PACKAGES) * 100) + '%';
+            document.getElementById('quota-text').innerText = `${count} / ${MAX_PACKAGES} Packages`;
+            
+            if (count >= MAX_PACKAGES) {
+                fill.classList.add('full');
+                subBtn.classList.remove('hidden');
+                btn.classList.add('btn-warning');
+                btn.innerText = "⭐ Upgrade to Create More";
+                btn.onclick = () => alert("Redirecting to Stripe Payment Gateway...");
+            } else {
+                fill.classList.remove('full');
+                subBtn.classList.add('hidden');
+                btn.classList.remove('btn-warning');
+                btn.classList.add('btn-primary');
+                btn.innerText = "＋ Create Package";
+                btn.onclick = openCreateForm;
+            }
+        }
+
+        function deletePackage(id) {
+            if(confirm("Permanently delete this package?")) { 
+                packages = packages.filter(p => p.id !== id); 
+                renderDashboard(); 
+            }
+        }
+
+        // --- SHELL CRUD (CREATE/EDIT) ---
+        function openCreateForm() {
+            editingShellId = null;
+            document.getElementById('shell-title-text').innerText = "Create Package Shell";
+            document.getElementById('sh-title').value = "";
+            document.getElementById('sh-origin').value = "Islamabad";
+            document.getElementById('sh-dest').value = "Naran";
+            document.getElementById('sh-days').value = "3";
+            document.getElementById('sh-nights').value = "2";
+            document.getElementById('sh-price').value = "15000";
+            showView('shell');
+        }
+
+        function openEditForm() {
+            const pkg = packages.find(p => p.id === activeWorkspaceId);
+            editingShellId = pkg.id;
+            document.getElementById('shell-title-text').innerText = "Edit Package Details";
+            document.getElementById('sh-title').value = pkg.title;
+            document.getElementById('sh-origin').value = pkg.origin;
+            document.getElementById('sh-dest').value = pkg.dest;
+            document.getElementById('sh-days').value = pkg.days;
+            document.getElementById('sh-nights').value = pkg.nights;
+            document.getElementById('sh-price').value = pkg.price;
+            showView('shell');
+        }
+
+        function savePackageShell() {
+            const title = document.getElementById('sh-title').value;
+            const origin = document.getElementById('sh-origin').value;
+            const dest = document.getElementById('sh-dest').value;
+            const days = document.getElementById('sh-days').value;
+            const nights = document.getElementById('sh-nights').value;
+            const price = document.getElementById('sh-price').value;
+
+            if(!title || !origin || !dest || !days || !nights || !price) { alert("All fields are required."); return; }
+            if(origin === dest) { alert("Origin and Destination must be different."); return; }
+
+            if (editingShellId !== null) {
+                // Update Existing
+                const pkg = packages.find(p => p.id === editingShellId);
+                pkg.title = title; pkg.origin = origin; pkg.dest = dest; 
+                pkg.days = days; pkg.nights = nights; pkg.price = price;
+                openWorkspace(pkg.id);
+            } else {
+                // Create New
+                const newPkg = {
+                    id: Date.now(), title, origin, dest, days, nights, price, isActive: false,
+                    stops: [], services: [], addons: []
+                };
+                packages.push(newPkg);
+                openWorkspace(newPkg.id);
+            }
+        }
+
+        // --- WORKSPACE & SUB-CRUD ---
+        function getActivePkg() { return packages.find(p => p.id === activeWorkspaceId); }
+
+        function openWorkspace(id) {
+            activeWorkspaceId = id;
+            refreshWorkspace();
+            showView('workspace');
+        }
+
+        function toggleCurrentPackageStatus() {
+            const pkg = getActivePkg();
+            pkg.isActive = document.getElementById('ws-toggle').checked;
+            document.getElementById('ws-status-text').innerText = pkg.isActive ? "Online" : "Draft";
+            document.getElementById('ws-status-text').style.color = pkg.isActive ? "var(--success)" : "var(--text-main)";
+        }
+
+        function refreshWorkspace() {
+            const pkg = getActivePkg();
+            
+            // Render Shell Readonly UI
+            document.getElementById('ws-title').innerText = pkg.title;
+            document.getElementById('ws-route').innerText = `📍 ${pkg.origin} → ${pkg.dest}`;
+            document.getElementById('ws-days').innerText = `${pkg.days} Days`;
+            document.getElementById('ws-nights').innerText = `${pkg.nights} Nights`;
+            document.getElementById('ws-price').innerText = parseInt(pkg.price).toLocaleString();
+            
+            const tgl = document.getElementById('ws-toggle');
+            tgl.checked = pkg.isActive;
+            document.getElementById('ws-status-text').innerText = pkg.isActive ? "Online" : "Draft";
+            document.getElementById('ws-status-text').style.color = pkg.isActive ? "var(--success)" : "var(--text-main)";
+
+            // Check Destination Lock
+            const hasDestination = pkg.stops.some(s => s.isDest);
+            if(hasDestination) {
+                document.getElementById('add-stop-form').classList.add('hidden');
+                document.getElementById('dest-locked-msg').classList.remove('hidden');
+            } else {
+                document.getElementById('add-stop-form').classList.remove('hidden');
+                document.getElementById('dest-locked-msg').classList.add('hidden');
+            }
+
+            // Render Stops
+            const slist = document.getElementById('ws-stops-list');
+            slist.innerHTML = pkg.stops.length === 0 ? "<div class='list-item list-item-bg'>No stops added.</div>" : "";
+            pkg.stops.forEach((s, i) => {
+                const destFlag = s.isDest ? " 🏁" : "";
+                slist.innerHTML += `
+                    <div class="list-item">
+                        <div><strong>Stop ${i+1}: ${s.city} ${destFlag}</strong> <br><span style="font-size:0.8rem;color:var(--text-muted)">VPs: ${s.vps.join(', ') || 'None'}</span></div>
+                        <button class="btn btn-danger btn-sm" onclick="removeStop(${i})">✕</button>
+                    </div>`;
+            });
+
+            // Render Services
+            const svclist = document.getElementById('ws-services-list');
+            svclist.innerHTML = pkg.services.length === 0 ? "<div class='list-item list-item-bg'>No services added.</div>" : "";
+            pkg.services.forEach((s, i) => {
+                svclist.innerHTML += `
+                    <div class="list-item">
+                        <div>✓ ${s}</div><button class="btn btn-danger btn-sm" onclick="removeService(${i})">✕</button>
+                    </div>`;
+            });
+
+            // Render Addons
+            const alist = document.getElementById('ws-addons-list');
+            alist.innerHTML = pkg.addons.length === 0 ? "<div class='list-item list-item-bg'>No add-ons added.</div>" : "";
+            pkg.addons.forEach((a, i) => {
+                alist.innerHTML += `
+                    <div class="list-item">
+                        <div>➕ ${a.name} <span style="font-size:0.8rem;color:var(--text-muted)">(+PKR ${parseInt(a.price).toLocaleString()})</span></div>
+                        <button class="btn btn-danger btn-sm" onclick="removeAddon(${i})">✕</button>
+                    </div>`;
+            });
+        }
+
+        // --- SUB-CRUD ACTIONS ---
+        function loadViewpoints() {
+            const city = document.getElementById('ws-stop-city').value;
+            const container = document.getElementById('vp-container');
+            const grid = document.getElementById('ws-viewpoints');
+            grid.innerHTML = "";
+            document.getElementById('ws-is-dest').checked = false; // reset dest checkbox
+
+            if(!city) { container.classList.add('hidden'); return; }
+            
+            container.classList.remove('hidden');
+            const vps = vpDB[city] || [];
+            if(vps.length === 0) { grid.innerHTML = "<div style='grid-column: 1/-1; color: var(--text-muted); font-size: 0.85rem;'>No viewpoints available.</div>"; return; }
+            
+            vps.forEach(vp => {
+                grid.innerHTML += `<label class="vp-item"><input type="checkbox" value="${vp}" class="vp-chk"> ${vp}</label>`;
+            });
+        }
+
+        function addStop() {
+            const city = document.getElementById('ws-stop-city').value;
+            if(!city) { alert("Please select a city."); return; }
+            
+            const checkedVps = Array.from(document.querySelectorAll('.vp-chk:checked')).map(cb => cb.value);
+            const isDest = document.getElementById('ws-is-dest').checked;
+
+            getActivePkg().stops.push({ city: city, vps: checkedVps, isDest: isDest });
+            
+            document.getElementById('ws-stop-city').value = "";
+            document.getElementById('vp-container').classList.add('hidden');
+            refreshWorkspace();
+        }
+        function removeStop(index) { getActivePkg().stops.splice(index, 1); refreshWorkspace(); }
+
+        function addService() {
+            const svc = document.getElementById('ws-service-sel').value;
+            if(!getActivePkg().services.includes(svc)) { getActivePkg().services.push(svc); refreshWorkspace(); }
+        }
+        function removeService(index) { getActivePkg().services.splice(index, 1); refreshWorkspace(); }
+
+        function addAddon() {
+            const name = document.getElementById('ws-addon-sel').value;
+            const price = document.getElementById('ws-addon-price').value;
+            if(!price) { alert("Enter an extra price for the add-on."); return; }
+            getActivePkg().addons.push({ name, price });
+            document.getElementById('ws-addon-price').value = "";
+            refreshWorkspace();
+        }
+        function removeAddon(index) { getActivePkg().addons.splice(index, 1); refreshWorkspace(); }
+
+    </script>
+</body>
+</html>

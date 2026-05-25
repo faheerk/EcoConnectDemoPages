@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>EcoConnect • Admin Console</title>
+  <style>
+    :root {
+      --primary: #0ea5e9;
+      --primary-hover: #0284c7;
+      --sidebar-bg: #f0f9ff;
+      --sidebar-hover: #e0f2fe;
+      --sidebar-active: #bae6fd;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #ca8a04;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; }
+    .hidden { display: none !important; }
+
+    .btn {
+      padding: 0.6rem 1.2rem; border: none; border-radius: 6px; font-weight: 600;
+      cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: inline-flex;
+      align-items: center; gap: 0.5rem; justify-content: center; background: white;
+    }
+    .btn-primary { background-color: var(--primary); color: white; border: 1px solid var(--primary); }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-danger { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: white; }
+    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+
+    .app-container { display: flex; height: 100vh; }
+    .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+    .logo span { color: #16a34a; }
+    .badge-admin { display: inline-flex; align-items: center; gap: 0.25rem; background: #e0f2fe; color: #0369a1; padding: 0.2rem 0.6rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; margin-top: 0.5rem; }
+    .nav-menu { list-style: none; padding: 1rem 0; flex-grow: 1; }
+    .nav-item { padding: 0.75rem 1.5rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
+    .nav-item:hover { background: var(--sidebar-hover); }
+    .nav-item.active { background: var(--sidebar-active); border-right: 4px solid var(--primary); color: var(--primary); }
+
+    .main-content { flex-grow: 1; overflow-y: auto; padding: 2rem 2.5rem; background: #f8fafc; }
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .stat-card { background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-value { font-size: 1.8rem; font-weight: 700; }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .form-group { margin-bottom: 1rem; text-align: left; }
+    .form-group label { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .form-control { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.8rem; background: #f1f5f9; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
+    td { padding: 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .status-badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .status-pending { background: #fef9c3; color: #854d0e; }
+    .status-approved { background: #dcfce7; color: #166534; }
+
+    .reference-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .ref-tag { background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 0.4rem; }
+    .ref-tag button { background: none; border: none; color: #0284c7; cursor: pointer; font-weight: bold; margin-left: 0.2rem; }
+
+    hr { border: 0.5px solid var(--border); margin: 1.5rem 0; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="adminApp">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">Eco<span>Connect</span></div>
+      <div style="font-weight: 700; margin-top: 0.3rem;">Admin Panel</div>
+      <div class="badge-admin">🔒 Super Admin</div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item active" data-view="dashboard"><span>📊</span> Dashboard</li>
+      <li class="nav-item" data-view="agencies"><span>🏢</span> Agency Approvals</li>
+      <li class="nav-item" data-view="reference"><span>🗺️</span> Reference Data</li>
+      <li class="nav-item" data-view="subscriptions"><span>⭐</span> Subscriptions</li>
+    </ul>
+    <div style="padding: 1.5rem; border-top: 1px solid var(--border); font-size:0.8rem; color: var(--text-muted);">
+      v1.0 • Admin Console
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <!-- Dashboard View -->
+    <div id="view-dashboard">
+      <div class="header-row">
+        <div><h1>Admin Overview</h1><p style="color: var(--text-muted);">Real-time platform metrics.</p></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" style="color:var(--primary);" id="statAgencies">3</div><div class="stat-label">Total Agencies</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:#eab308;" id="statPending">1</div><div class="stat-label">Pending Approval</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--success);" id="statPackages">2</div><div class="stat-label">Active Packages</div></div>
+        <div class="stat-card"><div class="stat-value" id="statRevenue">PKR 12,500</div><div class="stat-label">Subscription Revenue</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom: 1rem;">📋 Recent Activity</h3>
+        <div style="color: var(--text-muted);">✓ "Summit Trails" approved 5 min ago • New city "Swat" added to reference data.</div>
+      </div>
+    </div>
+
+    <!-- Agency Approvals View -->
+    <div id="view-agencies" class="hidden">
+      <div class="header-row"><h1>Agency Verification</h1></div>
+      <div class="card">
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>Agency</th><th>City</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="agencyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reference Data View -->
+    <div id="view-reference" class="hidden">
+      <div class="header-row"><h1>Cities & Viewpoints</h1></div>
+      <div class="form-row" style="grid-template-columns: 1fr 1fr auto; align-items: end; margin-bottom: 1.5rem;">
+        <div class="form-group" style="margin:0;"><label>City Name</label><input type="text" id="newCity" class="form-control" placeholder="e.g. Swat"></div>
+        <div class="form-group" style="margin:0;"><label>Viewpoints (comma separated)</label><input type="text" id="newViewpoints" class="form-control" placeholder="Mingora, Malam Jabba"></div>
+        <button class="btn btn-primary" onclick="addCityReference()">➕ Add City</button>
+      </div>
+      <div id="referenceListContainer"></div>
+    </div>
+
+    <!-- Subscriptions View -->
+    <div id="view-subscriptions" class="hidden">
+      <div class="header-row"><h1>Subscription Plans</h1></div>
+      <div class="card">
+        <div class="form-row" style="grid-template-columns: 1fr 1fr auto; align-items: end;">
+          <div class="form-group"><label>Plan Name</label><input type="text" id="planName" class="form-control" value="Pro"></div>
+          <div class="form-group"><label>Price (PKR)</label><input type="number" id="planPrice" class="form-control" value="5000"></div>
+          <button class="btn btn-primary" onclick="addSubscriptionPlan()">➕ Add Plan</button>
+        </div>
+        <hr>
+        <h4 style="margin-bottom: 1rem;">Active Plans</h4>
+        <div id="planListContainer"></div>
+      </div>
+      <div class="card" style="margin-top:1.5rem;">
+        <h4 style="margin-bottom:1rem;">Agency Subscriptions</h4>
+        <div id="agencySubList"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  (function() {
+    // ----- Admin State -----
+    const referenceData = {
+      "Islamabad": ["Faisal Mosque", "Daman-e-Koh", "Pakistan Monument"],
+      "Murree": ["Mall Road", "Pindi Point", "Patriata Cable Car"],
+      "Naran": ["Lake Saif ul Malook", "Babusar Pass", "Lulusar Lake"],
+      "Bahawalpur": ["Noor Mahal", "Derawar Fort", "Lal Suhanra"]
+    };
+
+    let agencies = [
+      { id: 1, name: "Summit Trails", city: "Islamabad", status: "approved" },
+      { id: 2, name: "Green Escape", city: "Lahore", status: "pending" },
+      { id: 3, name: "Northern Routes", city: "Peshawar", status: "approved" }
+    ];
+
+    let subscriptionPlans = [
+      { name: "Pro", price: 5000 }
+    ];
+
+    let agencySubscriptions = [
+      { agencyId: 1, plan: "Pro", active: true }
+    ];
+
+    // Helper: calculate stats
+    function getStats() {
+      const approved = agencies.filter(a => a.status === 'approved').length;
+      const pending = agencies.filter(a => a.status === 'pending').length;
+      const activePackages = 2; // static demo
+      const totalRevenue = agencySubscriptions.filter(s => s.active).reduce((sum, sub) => {
+        const plan = subscriptionPlans.find(p => p.name === sub.plan);
+        return sum + (plan ? plan.price : 0);
+      }, 0);
+      return { approved, pending, activePackages, totalRevenue };
+    }
+
+    // ----- UI Rendering -----
+    function renderAll() {
+      renderDashboardStats();
+      renderAgencyTable();
+      renderReferenceUI();
+      renderSubscriptionUI();
+    }
+
+    function renderDashboardStats() {
+      const stats = getStats();
+      document.getElementById('statAgencies').innerText = agencies.length;
+      document.getElementById('statPending').innerText = stats.pending;
+      document.getElementById('statPackages').innerText = stats.activePackages;
+      document.getElementById('statRevenue').innerText = `PKR ${stats.totalRevenue.toLocaleString()}`;
+    }
+
+    function renderAgencyTable() {
+      const tbody = document.getElementById('agencyTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = agencies.map(agency => `
+        <tr>
+          <td><strong>${agency.name}</strong></td>
+          <td>${agency.city}</td>
+          <td><span class="status-badge ${agency.status === 'approved' ? 'status-approved' : 'status-pending'}">${agency.status}</span></td>
+          <td>
+            ${agency.status === 'pending' ? 
+              `<button class="btn btn-success btn-sm" onclick="window.adminApprove(${agency.id})">✓ Approve</button>` : 
+              `<button class="btn btn-outline btn-sm" onclick="window.adminReject(${agency.id})">↩ Revoke</button>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderReferenceUI() {
+      const container = document.getElementById('referenceListContainer');
+      if (!container) return;
+      container.innerHTML = Object.entries(referenceData).map(([city, viewpoints]) => `
+        <div class="card" style="padding:1rem; margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0;">📍 ${city}</h4>
+            <button class="btn btn-danger btn-sm" onclick="window.deleteCity('${city}')">🗑 Remove</button>
+          </div>
+          <div class="reference-list">
+            ${viewpoints.map(vp => `<span class="ref-tag">${vp} <button onclick="window.removeViewpoint('${city}', '${vp}')">×</button></span>`).join('')}
+          </div>
+          <div style="margin-top:0.8rem; display:flex; gap:0.5rem;">
+            <input type="text" id="vpInput-${city}" class="form-control" placeholder="Add viewpoint" style="width:200px;">
+            <button class="btn btn-outline btn-sm" onclick="window.addViewpointToCity('${city}')">+ Add</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSubscriptionUI() {
+      const planContainer = document.getElementById('planListContainer');
+      if (planContainer) {
+        planContainer.innerHTML = subscriptionPlans.map((plan, idx) => `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.8rem; border-radius:6px; margin-bottom:0.5rem;">
+            <span><strong>${plan.name}</strong> — PKR ${plan.price}/month</span>
+            <button class="btn btn-danger btn-sm" onclick="window.removePlan(${idx})">Remove</button>
+          </div>
+        `).join('') || '<div style="color:var(--text-muted);">No plans yet.</div>';
+      }
+
+      const subList = document.getElementById('agencySubList');
+      if (subList) {
+        subList.innerHTML = agencySubscriptions.map(sub => {
+          const agency = agencies.find(a => a.id === sub.agencyId);
+          return `<div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid var(--border);">
+            <span>🏢 ${agency?.name || 'Unknown'} — <strong>${sub.plan}</strong> ${sub.active ? '✅ Active' : '⏸ Inactive'}</span>
+          </div>`;
+        }).join('') || '<div style="color:var(--text-muted);">No active subscriptions.</div>';
+      }
+    }
+
+    // ----- Global functions for buttons -----
+    window.adminApprove = function(id) {
+      const agency = agencies.find(a => a.id === id);
+      if (agency) agency.status = 'approved';
+      renderAll();
+    };
+    window.adminReject = function(id) {
+      const agency = agencies.find(a => a.id === id);
+      if (agency && confirm('Revoke approval for ' + agency.name + '?')) {
+        agency.status = 'pending';
+        renderAll();
+      }
+    };
+
+    window.addCityReference = function() {
+      const cityInput = document.getElementById('newCity');
+      const vpInput = document.getElementById('newViewpoints');
+      const city = cityInput.value.trim();
+      if (!city) return alert('Enter city name');
+      if (referenceData[city]) return alert('City already exists');
+      const viewpoints = vpInput.value.split(',').map(v => v.trim()).filter(v => v);
+      referenceData[city] = viewpoints.length ? viewpoints : [];
+      cityInput.value = '';
+      vpInput.value = '';
+      renderAll();
+    };
+
+    window.deleteCity = function(city) {
+      if (confirm(`Delete ${city} and all its viewpoints?`)) {
+        delete referenceData[city];
+        renderAll();
+      }
+    };
+
+    window.removeViewpoint = function(city, vp) {
+      if (referenceData[city]) {
+        referenceData[city] = referenceData[city].filter(v => v !== vp);
+        renderAll();
+      }
+    };
+
+    window.addViewpointToCity = function(city) {
+      const input = document.getElementById(`vpInput-${city}`);
+      if (!input) return;
+      const newVp = input.value.trim();
+      if (!newVp) return;
+      if (!referenceData[city]) referenceData[city] = [];
+      if (!referenceData[city].includes(newVp)) {
+        referenceData[city].push(newVp);
+        input.value = '';
+        renderAll();
+      } else {
+        alert('Viewpoint already exists.');
+      }
+    };
+
+    window.addSubscriptionPlan = function() {
+      const name = document.getElementById('planName').value.trim();
+      const price = parseInt(document.getElementById('planPrice').value);
+      if (!name || isNaN(price)) return alert('Fill plan details');
+      subscriptionPlans.push({ name, price });
+      document.getElementById('planName').value = 'Pro';
+      document.getElementById('planPrice').value = '5000';
+      renderAll();
+    };
+
+    window.removePlan = function(index) {
+      subscriptionPlans.splice(index, 1);
+      renderAll();
+    };
+
+    // ----- Navigation -----
+    function setupNavigation() {
+      const navItems = document.querySelectorAll('.nav-item');
+      const views = {
+        dashboard: document.getElementById('view-dashboard'),
+        agencies: document.getElementById('view-agencies'),
+        reference: document.getElementById('view-reference'),
+        subscriptions: document.getElementById('view-subscriptions')
+      };
+
+      navItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const viewKey = this.dataset.view;
+          navItems.forEach(n => n.classList.remove('active'));
+          this.classList.add('active');
+          Object.values(views).forEach(v => v?.classList.add('hidden'));
+          if (views[viewKey]) views[viewKey].classList.remove('hidden');
+          renderAll(); // refresh visible stats
+        });
+      });
+    }
+
+    // Initial render
+    window.onload = function() {
+      renderAll();
+      setupNavigation();
+      // default active dashboard
+      document.querySelector('.nav-item[data-view="dashboard"]').classList.add('active');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+    };
+  })();
+</script>
+</body>
+</html>
