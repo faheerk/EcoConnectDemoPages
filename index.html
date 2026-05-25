@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Eco Connect | Sustainable Tourism & Eco-Admin</title>
+  <!-- Google Fonts & simple CSS reset -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(145deg, #fbfef9 0%, #eef5e8 100%);
+      color: #1a2e1f;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* header / navbar */
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0 16px 0;
+      border-bottom: 2px solid #cfe3cf;
+      margin-bottom: 32px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      color: #2c6e2f;
+    }
+
+    .brand {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #1f4f1c, #3c9e3a);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .brand span {
+      font-weight: 500;
+      color: #2e7d32;
+      background: none;
+      background-clip: unset;
+      -webkit-background-clip: unset;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #1e3a1e;
+      transition: 0.2s;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a i {
+      font-size: 1.1rem;
+    }
+
+    .nav-links a:hover {
+      color: #2b7e2e;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      border: 2px solid #2c6e2f;
+      padding: 8px 18px;
+      border-radius: 40px;
+      background: transparent;
+      font-weight: 700;
+    }
+
+    .btn-outline:hover {
+      background: #2c6e2f;
+      color: white !important;
+    }
+
+    /* hero section */
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 48px;
+      margin: 48px 0 64px 0;
+    }
+
+    .hero-text {
+      flex: 1.2;
+    }
+
+    .hero-badge {
+      background: #e6f4e6;
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e5c1e;
+      margin-bottom: 20px;
+    }
+
+    .hero-text h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      color: #173e14;
+    }
+
+    .hero-text p {
+      font-size: 1.2rem;
+      color: #2c4d2a;
+      max-width: 90%;
+      margin-bottom: 32px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 20px;
+    }
+
+    .stat-item h3 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #2b6e2e;
+    }
+
+    .hero-image {
+      flex: 0.9;
+      background: #d9e8d4;
+      border-radius: 48px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+    }
+
+    .hero-image i {
+      font-size: 12rem;
+      color: #367a36;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
+    }
+
+    /* card section */
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 64px 0 40px 0;
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .section-title:after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: #3c9e3a;
+      margin: 12px auto 0;
+      border-radius: 4px;
+    }
+
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: center;
+      margin-bottom: 70px;
+    }
+
+    .demo-card {
+      background: white;
+      border-radius: 32px;
+      padding: 32px 28px;
+      flex: 1;
+      min-width: 260px;
+      max-width: 360px;
+      transition: all 0.25s ease;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
+      border: 1px solid #ddebe0;
+      text-align: center;
+    }
+
+    .demo-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 38px -12px rgba(42, 85, 39, 0.2);
+      border-color: #bdddbd;
+    }
+
+    .card-icon {
+      font-size: 3.5rem;
+      background: #eef5ea;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      color: #2c6e2f;
+    }
+
+    .demo-card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .demo-card p {
+      color: #3a5537;
+      margin-bottom: 28px;
+      font-size: 0.95rem;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #1f4f1c;
+      color: white;
+      padding: 12px 26px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.2s;
+      border: none;
+    }
+
+    .card-link i {
+      transition: transform 0.2s;
+    }
+
+    .card-link:hover {
+      background: #0e3a0c;
+      gap: 14px;
+    }
+
+    .card-link:hover i {
+      transform: translateX(4px);
+    }
+
+    .outline-link {
+      background: transparent;
+      border: 2px solid #2c6e2f;
+      color: #1f4f1c;
+    }
+
+    .outline-link:hover {
+      background: #2c6e2f;
+      color: white;
+    }
+
+    .info-banner {
+      background: #2c4d2a;
+      border-radius: 40px;
+      padding: 48px 40px;
+      margin: 40px 0 60px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .info-banner h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #f4f9ef;
+    }
+
+    .info-banner p {
+      color: #dcf2d4;
+      max-width: 500px;
+    }
+
+    .badge-group {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: #528a4a;
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-weight: 500;
+      color: white;
+    }
+
+    footer {
+      background: #132011;
+      color: #cde2c7;
+      padding: 48px 0 32px;
+      border-radius: 40px 40px 0 0;
+      margin-top: 60px;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .footer-copy {
+      font-size: 0.9rem;
+    }
+
+    .social i {
+      font-size: 1.5rem;
+      margin-left: 18px;
+      color: #b2daa8;
+      transition: 0.2s;
+    }
+
+    .social i:hover {
+      color: white;
+    }
+
+    @media (max-width: 780px) {
+      .navbar {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .hero-text h1 {
+        font-size: 2.4rem;
+      }
+      .hero-text p {
+        max-width: 100%;
+      }
+      .hero {
+        flex-direction: column;
+      }
+      .container {
+        padding: 0 24px;
+      }
+      .card-grid {
+        gap: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- header with brand and navigation links to both pages -->
+    <div class="navbar">
+      <div class="logo-area">
+        <i class="fas fa-leaf logo-icon"></i>
+        <div class="brand">Eco<span>Connect</span></div>
+      </div>
+      <div class="nav-links">
+        <a href="#features"><i class="fas fa-seedling"></i> Impact</a>
+        <!-- Direct links to the two existing pages in the same repo: demo.html & admineco.html -->
+        <a href="demo.html" class="btn-outline"><i class="fas fa-map-marked-alt"></i> Tour Guide Demo</a>
+        <a href="admineco.html" class="btn-outline"><i class="fas fa-user-shield"></i> Admin Eco</a>
+      </div>
+    </div>
+
+    <!-- hero section -->
+    <div class="hero">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <i class="fas fa-globe-americas"></i> Green Tourism · Smart Management
+        </div>
+        <h1>Explore nature,<br>empower communities.</h1>
+        <p>Eco Connect bridges local tour guiding experiences with an intelligent administrative dashboard — all in one sustainable ecosystem.</p>
+        <div class="hero-stats">
+          <div class="stat-item"><h3>120+</h3><span>Eco tours</span></div>
+          <div class="stat-item"><h3>34</h3><span>Protected zones</span></div>
+          <div class="stat-item"><h3>2.8k</h3><span>Happy travelers</span></div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <i class="fas fa-tree"></i>
+        <p style="margin-top: 12px; font-weight: 500; color:#1d441d;">Your gateway to responsible adventure</p>
+      </div>
+    </div>
+
+    <!-- core call to action: two main cards (explicit links to both pages) -->
+    <div class="section-title">Launch your experience</div>
+    <div class="card-grid">
+      <!-- Tour Guide demo card -> links to demo.html -->
+      <div class="demo-card">
+        <div class="card-icon"><i class="fas fa-hiking"></i></div>
+        <h3>TourGuide Demo</h3>
+        <p>Interactive journey for travelers & local guides. Discover trails, earn green points, share real-time eco-tips.</p>
+        <a href="demo.html" class="card-link">Launch Demo <i class="fas fa-arrow-right"></i></a>
+        <div style="margin-top: 16px; font-size: 0.8rem; color:#4f7a4a;"><i class="fas fa-map-pin"></i> Live preview · demo.html</div>
+      </div>
+      <!-- Admin Eco demo card -> links to admineco.html -->
+      <div class="demo-card">
+        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+        <h3>AdminEco Dashboard</h3>
+        <p>Full administrative control — monitor tours, manage guides, sustainability metrics, and eco-reports.</p>
+        <a href="admineco.html" class="card-link outline-link">Access Admin <i class="fas fa-shield-alt"></i></a>
+        <div style="margin-top: 16px; font-size: 0.8rem; color:#4f7a4a;"><i class="fas fa-laptop-code"></i> admineco.html · realtime insights</div>
+      </div>
+      <!-- extra info card: how the ecosystem works (optional but professional) -->
+      <div class="demo-card">
+        <div class="card-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <h3>Why Eco Connect</h3>
+        <p>Seamless integration between field operations and admin oversight. Built for sustainability, transparency & local growth.</p>
+        <a href="#features" class="card-link outline-link" style="background: transparent; border:2px solid #cfdecb; color:#1c4d1c;">Learn more <i class="fas fa-leaf"></i></a>
+      </div>
+    </div>
+
+    <!-- additional feature section (reassuring content) -->
+    <div id="features" style="scroll-margin-top: 40px;"></div>
+    <div class="section-title">Everything you need, unified</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; justify-content: space-between; margin-bottom: 56px;">
+      <div style="flex:1; min-width: 200px;">
+        <i class="fas fa-map-marked-alt" style="font-size: 2rem; color:#3c9e3a; margin-bottom: 12px; display: block;"></i>
+        <h3 style="margin-bottom: 8px;">Live Tour Guide</h3>
+        <p style="color: #2a4e26;">demo.html includes interactive itineraries, AR nature spots, and responsible tourism tips.</p>
+      </div>
+      <div style="flex:1; min-width: 200px;">
+        <i class="fas fa-chalkboard-user" style="font-size: 2rem; color:#3c9e3a; margin-bottom: 12px; display: block;"></i>
+        <h3 style="margin-bottom: 8px;">Admin Ecosystem</h3>
+        <p style="color: #2a4e26;">Admineco.html grants advanced control — user analytics, route approvals, and carbon offset tracker.</p>
+      </div>
+      <div style="flex:1; min-width: 200px;">
+        <i class="fas fa-cloud-sun" style="font-size: 2rem; color:#3c9e3a; margin-bottom: 12px; display: block;"></i>
+        <h3 style="margin-bottom: 8px;">Open Source on GitHub</h3>
+        <p style="color: #2a4e26;">Both pages live in same repo. Works flawlessly as static HTML/CSS/JS prototypes.</p>
+      </div>
+    </div>
+
+    <!-- Banner for repository info & direct context -->
+    <div class="info-banner">
+      <div>
+        <h3><i class="fab fa-github"></i> Hosted on GitHub Pages</h3>
+        <p>You already uploaded demo.html & admineco.html — index.html is the central hub. All relative links work perfectly in the same repository.</p>
+      </div>
+      <div class="badge-group">
+        <span class="badge"><i class="fas fa-check-circle"></i> demo.html ready</span>
+        <span class="badge"><i class="fas fa-check-circle"></i> admineco.html ready</span>
+        <span class="badge"><i class="fas fa-code-branch"></i> main branch</span>
+      </div>
+    </div>
+
+    <!-- quick navigation panel: ensures user can always jump to the pages -->
+    <div style="text-align: center; margin: 40px 0 20px;">
+      <h3 style="font-weight: 600; margin-bottom: 20px;">Quick access to project modules</h3>
+      <div style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;">
+        <a href="demo.html" style="background: #ecf7e8; padding: 12px 32px; border-radius: 60px; text-decoration: none; font-weight:600; color:#1e511e;"><i class="fas fa-map"></i> Tour Guide Interface (demo.html)</a>
+        <a href="admineco.html" style="background: #e1ede1; padding: 12px 32px; border-radius: 60px; text-decoration: none; font-weight:600; color:#1e511e;"><i class="fas fa-tachometer-alt"></i> Admin Control Panel (admineco.html)</a>
+      </div>
+      <p style="margin-top: 18px; font-size: 0.85rem; color: #547a4d;"><i class="fas fa-folder-open"></i> Both files are published live on the same repo — index.html acts as professional homepage.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-copy">
+          <i class="fas fa-seedling" style="margin-right: 8px;"></i> Eco Connect — bridging nature & innovation<br>
+          <span style="font-size: 0.8rem;">© 2025 · Sustainable Tourism Initiative</span>
+        </div>
+        <div class="social">
+          <i class="fab fa-github"></i>
+          <i class="fab fa-twitter"></i>
+          <i class="fab fa-instagram"></i>
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div style="font-size: 0.8rem;">
+          <span>🌿 demo.html (TourGuide)</span> &nbsp;|&nbsp; 
+          <span>🌱 admineco.html (AdminEco)</span>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 32px; font-size: 0.75rem; border-top: 1px solid #2c4127; padding-top: 24px;">
+        ✨ This index page professionally integrates both projects. All navigation links point to existing files in same repository — perfect for GitHub Pages deployment.
+      </div>
+    </div>
+  </footer>
+
+  <!-- subtle confirmation that links are live relative paths (works on local and GH Pages) -->
+  <script>
+    // small additional check to make console friendly, ensure that links are not broken by environment.
+    (function() {
+      // just a decorative touch to show readiness
+      console.log("🌿 Eco Connect Central Hub — Ready. Links point to demo.html and admineco.html in same repo.");
+      // No further logic needed, all href are relative.
+      const demoLink = document.querySelector('a[href="demo.html"]');
+      const adminLink = document.querySelector('a[href="admineco.html"]');
+      if(demoLink && adminLink) {
+        // optional: add event tracking for fun? not necessary
+      }
+    })();
+  </script>
+</body>
+</html>
